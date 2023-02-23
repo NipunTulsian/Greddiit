@@ -3,23 +3,22 @@ import Navbar from './Navbar';
 import "../style/MySubgrediitProfile.css";
 import bitmoji from "../images/bitmoji.png";
 import { BsPersonCircle } from 'react-icons/bs';
-import { useParams, Link, useNavigate,Navigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, Navigate } from 'react-router-dom';
 import Loader from './Loader';
 
 export default function MySubgrediitProfile() {
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     const handleKeyPress = useCallback((event) => {
         if (event.key === 'j') {
             navigate(`/mysubgrediits/${params.mysub}/joinrequest`);
         }
-        else if(event.key==='r')
-        {
+        else if (event.key === 'r') {
             navigate(`/mysubgrediits/${params.mysub}/reports`);
         }
-        else if(event.key==='s'){
+        else if (event.key === 's') {
             navigate(`/mysubgrediits/${params.mysub}/stats`);
         }
-        else if(event.key==='u'){
+        else if (event.key === 'u') {
             navigate(`/mysubgrediits/${params.mysub}`);
 
         }
@@ -41,7 +40,6 @@ export default function MySubgrediitProfile() {
     const [loader, setloader] = useState(false);
 
     const fetchSubgreddiitDet = async () => {
-        setloader(true);
         const serverRes = await fetch("http://localhost:8000/user/getdetailsMySubgreddiit", {
             method: 'POST',
             headers: {
@@ -68,12 +66,12 @@ export default function MySubgrediitProfile() {
                 block: serverResJson.blocked
             })
         }
-        setloader(false);
     }
     useEffect(() => {
+        setloader(true);
         fetchSubgreddiitDet();
         document.addEventListener('keydown', handleKeyPress);
-
+        setloader(false);
         // remove the event listener
         return () => {
             document.removeEventListener('keydown', handleKeyPress);

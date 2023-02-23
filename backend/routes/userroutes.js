@@ -347,7 +347,9 @@ routerUser.use("/deletesubgreddiit", protect, async (req, res) => {
         let postGreddiit = await posts.find({ subGreddit: subId }).select(["_id", "saved"]);
 
         for (let i = 0; i < postGreddiit.length; i++) {
-            await report.findOneAndDelete({ PostId: postGreddiit[i]._id });
+            const reportPost = await report.find({ PostId: postGreddiit[i]._id });
+            for (let j = 0; j < reportPost.length; j++)
+                await report.findByIdAndDelete(reportPost[j]._id);
         }
         for (let i = 0; i < postGreddiit.length; i++) {
             for (let j = 0; j < postGreddiit[i].saved.length; j++) {

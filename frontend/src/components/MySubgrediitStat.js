@@ -38,7 +38,6 @@ export default function MySubgrediitStat(props) {
     });
 
     const fetchSubgreddiitDet = async () => {
-        setloader(true);
         const serverRes = await fetch("http://localhost:8000/user/getdetailsMySubgreddiitStat", {
             method: 'POST',
             headers: {
@@ -68,6 +67,7 @@ export default function MySubgrediitStat(props) {
         }
     }
     useEffect(() => {
+        setloader(true);
         fetchSubgreddiitDet();
         setloader(false);
         document.addEventListener('keydown', handleKeyPress);
