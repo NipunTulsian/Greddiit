@@ -84,6 +84,7 @@ export default function MySubgrediitJoin() {
     }, [reload,handleKeyPress]);
 
     const acceptReq = async (event) => {
+        setloader(true);
         const buttonClicked = event.target;
         const id = buttonClicked.parentElement.parentElement.id;
 
@@ -103,9 +104,12 @@ export default function MySubgrediitJoin() {
         if (serverRes.status === 201) {
             setReload(!reload);
         }
+        setloader(false);
     }
 
+
     const rejectReq = async (event) => {
+        setloader(true);
         const buttonClicked = event.target;
         const id = buttonClicked.parentElement.parentElement.id;
 
@@ -125,6 +129,7 @@ export default function MySubgrediitJoin() {
         if (serverRes.status === 201) {
             setReload(!reload);
         }
+        setloader(false);
     }
 
     if (localStorage.getItem("token")) {
@@ -204,12 +209,12 @@ export default function MySubgrediitJoin() {
                                                 <span onClick={rejectReq}>Reject</span>
                                             </div>
                                         </div>
-                                        <div class="offcanvas offcanvas-start" tabindex="-1" id={"offcanvas" + element._id} aria-labelledby="offcanvasExampleLabel" style={{ backgroundColor: "rgb(187, 193, 240)", color: "#fff" }}>
-                                            <div class="offcanvas-header">
-                                                <h2 class="offcanvas-title">Details</h2>
-                                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                        <div className="offcanvas offcanvas-start" tabindex="-1" id={"offcanvas" + element._id} aria-labelledby="offcanvasExampleLabel" style={{ backgroundColor: "rgb(187, 193, 240)", color: "#fff" }}>
+                                            <div className="offcanvas-header">
+                                                <h2 className="offcanvas-title">Details</h2>
+                                                <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                                             </div>
-                                            <div class="offcanvas-body">
+                                            <div className="offcanvas-body">
                                                 <div className='displayOwnerDetails'>
                                                     <img src={bitmoji} alt="logo" height={300} style={{ border: "3px solid #fff", width: "100%", marginBottom: "10px", borderRadius: "10px" }} />
                                                     <div className='displayData'>

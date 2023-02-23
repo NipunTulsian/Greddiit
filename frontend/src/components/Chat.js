@@ -16,7 +16,7 @@ export default function Chat() {
     const scrollRef = useRef();
 
     useEffect(() => {
-        socket.current = io("ws://localhost:8900");
+        socket.current = io("http://localhost:8000");
         console.log(socket);
         socket.current.on("getMessage", data => {
             setArrivalMessage({

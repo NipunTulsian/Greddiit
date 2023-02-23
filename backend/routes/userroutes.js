@@ -151,7 +151,7 @@ routerUser.post("/login", async (req, res) => {
 
         const userExist = await user.findOne({ email });
         if (!userExist) {
-            return res.status(400).json("Email or password is wrong");
+            return res.status(400).json("Email doesn't exist");
         }
         const isMatch = await bcyrpt.compare(password, userExist.password);
         if (userExist && isMatch) {
@@ -162,11 +162,12 @@ routerUser.post("/login", async (req, res) => {
             })
         }
         else {
-            return res.status(400).json("Email or password is wrong");
+            return res.status(401).json("Email or password is wrong");
         }
     }
-    catch {
-        return res.status(401).send("error");
+    catch (e) {
+        console.log(e);
+        return res.status(500).send("error");
     }
 })
 
@@ -641,10 +642,11 @@ routerUser.use("/getdetailsMySubgreddiitStat", protect, async (req, res) => {
 
 routerUser.use("/fetchPost", protect, async (req, res) => {
     try {
-        const sub = req.body.id;
-        const post = await posts.find({ subGreddit: sub });
-        const blocked = await subgreddiitModel.findById(sub).select("blockedUser");
-        const blockedArr = blocked.blockedUser;
+        const subId = req.body.id;
+        const user = req.user._id;
+        const post = await posts.find({ subGreddit: subId });
+        const sub = await subgreddiitModel.findById(subId).select(["blockedUser", "owner"]);
+        const blockedArr = sub.blockedUser;
 
         for (let i = 0; i < post.length; i++) {
             if (blockedArr.includes(post[i].postedBy.id)) {
@@ -657,7 +659,8 @@ routerUser.use("/fetchPost", protect, async (req, res) => {
             user: req.user.id,
         });
     }
-    catch {
+    catch (e) {
+        console.log(e);
         return res.status(401).send("Error");
     }
 })
@@ -719,9 +722,9 @@ routerUser.use("/newPost", protect, async (req, res) => {
 
         await subgreddiitModel.findByIdAndUpdate(sub, { $push: { posts: newPost._id } });
         if (!flag)
-            return res.status(201).send("successfully created")
+            return res.status(201).json(newPost);
         else if (flag)
-            return res.status(202).send("contained ban words")
+            return res.status(202).json(newPost);
     }
     catch (e) {
         console.log(e);
@@ -739,7 +742,7 @@ routerUser.use("/Postupvote", protect, async (req, res) => {
             if (!postUpdate.liked.includes(userId)) {
                 await posts.findByIdAndUpdate(postId, { $pull: { disliked: userId } });
                 const post = await posts.findByIdAndUpdate(postId, { $push: { liked: userId } }, { new: true });
-                return res.status(201).json(post);
+                return res.status(201).json(post.liked.length);
             }
             else {
                 return res.status(202).send("Already Added");
@@ -757,8 +760,8 @@ routerUser.use("/Postupvotedelete", protect, async (req, res) => {
     const userId = req.user._id;
     if (ObjectId.isValid(postId)) {
         try {
-            await posts.findByIdAndUpdate(postId, { $pull: { liked: userId } });
-            return res.status(201).send("success");
+            const post = await posts.findByIdAndUpdate(postId, { $pull: { liked: userId } }, { new: true });
+            return res.status(201).json(post.liked.length);
         }
         catch {
             return res.status(400).send("Error");
@@ -774,7 +777,7 @@ routerUser.use("/Postdownvote", protect, async (req, res) => {
         try {
             await posts.findByIdAndUpdate(postId, { $pull: { liked: userId } });
             const post = await posts.findByIdAndUpdate(postId, { $push: { disliked: userId } }, { new: true });
-            return res.status(201).json(post);
+            return res.status(201).json(post.liked.length);
         }
         catch {
             return res.status(400).send("Error");
@@ -788,8 +791,8 @@ routerUser.use("/Postdownvotedelete", protect, async (req, res) => {
     const userId = req.user._id;
     if (ObjectId.isValid(postId)) {
         try {
-            await posts.findByIdAndUpdate(postId, { $pull: { disliked: userId } });
-            return res.status(201).send("success");
+            const post = await posts.findByIdAndUpdate(postId, { $pull: { disliked: userId } }, { new: true });
+            return res.status(201).json(post.liked.length);
         }
         catch {
             return res.status(400).send("Error");
@@ -895,9 +898,15 @@ routerUser.use("/addComment", protect, async (req, res) => {
             }
         }
     }, { new: true });
+    let newcom = null;
+    for (let i = 0; i < post.comments.length; i++) {
+        if (post.comments[i].userId.toString() === userId.toString() && post.comments[i].userName === username && post.comments[i].comment === comment) {
+            newcom = post.comments[i];
+        }
+    }
 
     if (post)
-        return res.status(201).json("Successful");
+        return res.status(201).json(newcom);
     else {
         return res.status(401).send("Error");
     }
@@ -945,7 +954,10 @@ routerUser.use("/getSavedpost", protect, async (req, res) => {
 
         for (let i = 0; i < SavedArr.length; i++) {
             let temp = await posts.findById(SavedArr[i]);
-            let sub = await subgreddiitModel.findById(temp.subGreddit).select("name");
+            let sub = await subgreddiitModel.findById(temp.subGreddit).select(["name", "blockedUser"]);
+            if (sub.blockedUser.includes(temp.postedBy.id)) {
+                temp.postedBy.username = "Blocked User";
+            }
             let tempObj = {
                 postedBy: temp.postedBy,
                 _id: temp._id,
@@ -965,7 +977,8 @@ routerUser.use("/getSavedpost", protect, async (req, res) => {
             user: userId,
         })
     }
-    catch {
+    catch (e) {
+        console.log(e);
         return res.status(400).send("Error");
     }
 })
@@ -1199,7 +1212,7 @@ routerUser.use("/conversation", protect, async (req, res) => {
         let convo = await conversation.find({
             members: { $all: [id1, id2] }
         });
-        
+
         if (convo.length > 0) {
             return res.status(201).json(convo);
         }
@@ -1208,7 +1221,7 @@ routerUser.use("/conversation", protect, async (req, res) => {
             members: [req.body.id, req.user._id]
         };
         convo = await conversation.create(obj);
-        
+
         return res.status(201).json(convo);
     }
     catch (e) {

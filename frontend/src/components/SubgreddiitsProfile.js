@@ -101,17 +101,21 @@ export default function SubgreddiitsProfile() {
         }
         );
         if (serverRes.status === 201) {
+            const serverResJson = await serverRes.json();
+            //setPost([serverResJson, ...post]);
             setnewpostData("");
         }
         else if (serverRes.status === 202) {
             alert("Your post contains ban keywords");
+            const serverResJson = await serverRes.json();
+            //setPost((prev) => [serverResJson, ...prev]);
             setnewpostData("");
         }
         else {
             alert("Error Occured! Please try again!")
         }
-        setloader(false);
         setReload(!reload);
+        setloader(false);
     }
 
     if (localStorage.getItem("token")) {
@@ -194,21 +198,21 @@ export default function SubgreddiitsProfile() {
                                     {post.map((element) => {
                                         if (element.liked.includes(user)) {
                                             if (element.saved.includes(user))
-                                                return <AccordianSubgrdiitProfile key={element._id} setReload={setReload} reload={reload} id={element._id} saved={1} post={element.post} liked={element.liked.length} postedBy={element.postedBy.username} postedByid={element.postedBy.id} likedUser={1} dislikedUser={0} disliked={element.disliked.length} comments={element.comments} />
+                                                return <AccordianSubgrdiitProfile key={element._id} setReload={setReload} reload={reload} loading={setloader} id={element._id} saved={1} post={element.post} liked={element.liked.length} postedBy={element.postedBy.username} postedByid={element.postedBy.id} likedUser={1} dislikedUser={0} disliked={element.disliked.length} comments={element.comments} />
                                             else
-                                                return <AccordianSubgrdiitProfile key={element._id} id={element._id} setReload={setReload} reload={reload} saved={0} post={element.post} liked={element.liked.length} postedBy={element.postedBy.username} postedByid={element.postedBy.id} likedUser={1} dislikedUser={0} disliked={element.disliked.length} comments={element.comments} />
+                                                return <AccordianSubgrdiitProfile key={element._id} id={element._id} setReload={setReload} loading={setloader} reload={reload} saved={0} post={element.post} liked={element.liked.length} postedBy={element.postedBy.username} postedByid={element.postedBy.id} likedUser={1} dislikedUser={0} disliked={element.disliked.length} comments={element.comments} />
                                         }
                                         else if (element.disliked.includes(user)) {
                                             if (element.saved.includes(user))
-                                                return <AccordianSubgrdiitProfile key={element._id} setReload={setReload} reload={reload} id={element._id} saved={1} post={element.post} liked={element.liked.length} postedBy={element.postedBy.username} postedByid={element.postedBy.id} likedUser={0} dislikedUser={1} disliked={element.disliked.length} comments={element.comments} />
+                                                return <AccordianSubgrdiitProfile key={element._id} setReload={setReload} reload={reload} loading={setloader} id={element._id} saved={1} post={element.post} liked={element.liked.length} postedBy={element.postedBy.username} postedByid={element.postedBy.id} likedUser={0} dislikedUser={1} disliked={element.disliked.length} comments={element.comments} />
                                             else
-                                                return <AccordianSubgrdiitProfile key={element._id} setReload={setReload} reload={reload} id={element._id} saved={0} post={element.post} liked={element.liked.length} postedBy={element.postedBy.username} postedByid={element.postedBy.id} likedUser={0} dislikedUser={1} disliked={element.disliked.length} comments={element.comments} />
+                                                return <AccordianSubgrdiitProfile key={element._id} setReload={setReload} reload={reload} loading={setloader} id={element._id} saved={0} post={element.post} liked={element.liked.length} postedBy={element.postedBy.username} postedByid={element.postedBy.id} likedUser={0} dislikedUser={1} disliked={element.disliked.length} comments={element.comments} />
 
                                         } else {
                                             if (element.saved.includes(user))
-                                                return <AccordianSubgrdiitProfile key={element._id} setReload={setReload} reload={reload} id={element._id} saved={1} post={element.post} liked={element.liked.length} postedBy={element.postedBy.username} postedByid={element.postedBy.id} likedUser={0} dislikedUser={0} disliked={element.disliked.length} comments={element.comments} />
+                                                return <AccordianSubgrdiitProfile key={element._id} setReload={setReload} reload={reload} loading={setloader} id={element._id} saved={1} post={element.post} liked={element.liked.length} postedBy={element.postedBy.username} postedByid={element.postedBy.id} likedUser={0} dislikedUser={0} disliked={element.disliked.length} comments={element.comments} />
                                             else
-                                                return <AccordianSubgrdiitProfile key={element._id} setReload={setReload} reload={reload} id={element._id} saved={0} post={element.post} liked={element.liked.length} postedBy={element.postedBy.username} postedByid={element.postedBy.id} likedUser={0} dislikedUser={0} disliked={element.disliked.length} comments={element.comments} />
+                                                return <AccordianSubgrdiitProfile key={element._id} setReload={setReload} reload={reload} loading={setloader} id={element._id} saved={0} post={element.post} liked={element.liked.length} postedBy={element.postedBy.username} postedByid={element.postedBy.id} likedUser={0} dislikedUser={0} disliked={element.disliked.length} comments={element.comments} />
                                         }
                                     })}
                                 </div>

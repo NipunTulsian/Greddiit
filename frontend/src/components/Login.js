@@ -12,6 +12,7 @@ import { FcGoogle } from "react-icons/fc";
 export default function Login() {
     const [emailExist, setEmail] = useState(0);
     const [usernameExist, setUsername] = useState(0);
+    const [register,setregister]=useState(0);
     const [LoggedIn, setLogin] = useState(0); //to login after right credentials entered
     const [LoginData, setLoginData] = useState({
         email: "",
@@ -40,10 +41,12 @@ export default function Login() {
         setUsername(0);
         setwrongAge(0);
         setwrongContact(0);
+        setregister(0);
     }
 
     const updateData = (event) => {
         setCredantial(0);
+        setregister(0);
         setLoginData({
             ...LoginData,
             [event.target.name]: event.target.value,
@@ -67,6 +70,9 @@ export default function Login() {
             setLogin(1);
         }
         else if (serverRes.status === 400) {
+            setregister(1);
+        }
+        else if(serverRes.status===401){
             setCredantial(1);
         }
     }
@@ -153,6 +159,9 @@ export default function Login() {
                                 {WrongCredantial > 0 && <div className='WrongCredentials'>
                                     Sorry, your password was incorrect.<br /> Please double-check your password.
                                 </div>}
+                                {register > 0 && <div className='WrongCredentials'>
+                                Please Register Yourself
+                            </div>}
                             </form>
                             <div style={{ display: "flex", alignItems: "center", flexDirection: "row" }}>
                                 <FcGoogle size={25} style={{ cursor: "pointer", marginRight: "10px" }} onClick={google} />

@@ -42,7 +42,6 @@ export default function MySubgrediitReport() {
     const [reload, setReload] = useState(false);
 
     const fetchSubgreddiitDet = async () => {
-        setloader(true);
         const serverRes = await fetch("http://localhost:8000/user/getdetailsMySubgreddiitRequestJoin", {
             method: 'POST',
             headers: {
@@ -68,7 +67,6 @@ export default function MySubgrediitReport() {
                 posts: serverResJson.posts,
             })
         }
-        setloader(false);
     }
 
     const fetchReport = async () => {
@@ -92,6 +90,7 @@ export default function MySubgrediitReport() {
     }
 
     const deleteReport = async (event) => {
+        setloader(true);
         const buttonClicked = event.target;
         const id = buttonClicked.parentElement.parentElement.parentElement.id;
         const serverRes = await fetch("http://localhost:8000/user/deleteReport", {
@@ -107,8 +106,9 @@ export default function MySubgrediitReport() {
         );
         if (serverRes.status === 201) {
             alert("Deleted report");
-            setReload(!reload);
+            fetchReport();
         }
+        setloader(false)
     }
 
     const ignoreReport = async (event) => {
@@ -129,7 +129,7 @@ export default function MySubgrediitReport() {
 
         if (serverRes.status === 201) {
             alert("Ignored Report");
-            setReload(!reload);
+            fetchReport();
         }
     }
 
@@ -176,18 +176,23 @@ export default function MySubgrediitReport() {
         }
         );
         setloader(false);
-        if(serverRes.status===403)
-        {
+        if(serverRes.status===201){
+            alert("Blocked");
+        }
+        else if (serverRes.status === 403) {
             alert("Cannot block Moderator");
         }
         else if (serverRes.status === 402) {
             alert("Already blocked");
         }
+        fetchReport();
     }
 
     useEffect(() => {
+        setloader(true);
         fetchSubgreddiitDet();
         fetchReport();
+        setloader(false);
         document.addEventListener('keydown', handleKeyPress);
         return () => {
             document.removeEventListener('keydown', handleKeyPress);
