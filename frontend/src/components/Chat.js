@@ -4,6 +4,7 @@ import "../style/conversation.css"
 import Conversation from './Conversation'
 import Message from './Message'
 import { io } from "socket.io-client"
+import { Navigate } from "react-router-dom"
 
 export default function Chat() {
     const [conversation, setconversation] = useState([]);
@@ -116,53 +117,60 @@ export default function Chat() {
         scrollRef.current?.scrollIntoView()
     }, [message])
 
-    return (
-        <div>
-            <Navbar />
-            <div className='wrapperChat'>
-                <div className='chatMenu'>
-                    <div className='chatMenuWrapper'>
-                        <input placeholder='Seacrh freinds' className='inputChatMenu'></input>
-                        {
-                            conversation.map((element) => {
-                                return <div key={element._id}>
-                                    <div onClick={() => {
-                                        setcurrchat(element)
-                                    }}>
-                                        <Conversation ele={element} user={user} />
+    if (localStorage.getItem("token")) {
+        return (
+            <div>
+                <Navbar />
+                <div className='wrapperChat'>
+                    <div className='chatMenu'>
+                        <div className='chatMenuWrapper'>
+                            <input placeholder='Seacrh freinds' className='inputChatMenu'></input>
+                            {
+                                conversation.map((element) => {
+                                    return <div key={element._id}>
+                                        <div onClick={() => {
+                                            setcurrchat(element)
+                                        }}>
+                                            <Conversation ele={element} user={user} />
+                                        </div>
                                     </div>
-                                </div>
-                            })
-                        }
+                                })
+                            }
+                        </div>
                     </div>
-                </div>
-                <div className='chatBox'>
-                    <div className='chatBoxWrapper'>
-                        {
-                            currChat ?
-                                <>
-                                    <div className='chatBoxTop'>
-                                        {
-                                            message.map((element) => {
-                                                return <div key={element._id} ref={scrollRef}><Message msg={element} own={element.senderId.toString() === user.toString() ? true : false} /></div>
-                                            })
-                                        }
-                                    </div>
-                                    <div>
-                                        <form onSubmit={sendMessage} className='chatBoxBottom'>
-                                            <textarea className='chatMessageInput' placeholder='Write Something...' value={chat} onChange={(event) => {
-                                                setchat(event.target.value)
-                                            }}></textarea>
-                                            <button type='submit' className='chatMessageSubmit'>Send</button>
-                                        </form>
-                                    </div>
-                                </> : <span className="Nochat">Open a Conversation to start chat</span>}
+                    <div className='chatBox'>
+                        <div className='chatBoxWrapper'>
+                            {
+                                currChat ?
+                                    <>
+                                        <div className='chatBoxTop'>
+                                            {
+                                                message.map((element) => {
+                                                    return <div key={element._id} ref={scrollRef}><Message msg={element} own={element.senderId.toString() === user.toString() ? true : false} /></div>
+                                                })
+                                            }
+                                        </div>
+                                        <div>
+                                            <form onSubmit={sendMessage} className='chatBoxBottom'>
+                                                <textarea className='chatMessageInput' placeholder='Write Something...' value={chat} onChange={(event) => {
+                                                    setchat(event.target.value)
+                                                }}></textarea>
+                                                <button type='submit' className='chatMessageSubmit'>Send</button>
+                                            </form>
+                                        </div>
+                                    </> : <span className="Nochat">Open a Conversation to start chat</span>}
+                        </div>
                     </div>
-                </div>
-                <div className='chatOnline'>
-                    <div className='chatOnlineWrapper'></div>
+                    <div className='chatOnline'>
+                        <div className='chatOnlineWrapper'></div>
+                    </div>
                 </div>
             </div>
-        </div>
-    )
+        )
+    }
+    else {
+        return (
+            <Navigate to="/" />
+        )
+    }
 }

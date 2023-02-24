@@ -4,12 +4,13 @@ import bitmoji from "../images/bitmoji.png";
 import { useNavigate } from 'react-router-dom';
 
 export default function FollowerItems(props) {
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     const [chat, setchat] = useState(false);
     const removeFol = async (event) => {
         const buttonClicked = event.target;
-        let parent = buttonClicked.parentElement;
+        let parent = buttonClicked.parentElement.parentElement;
         const parentId = parent.id;
+        console.log(parentId)
         props.setloader(true);
         const serverRes = await fetch("http://localhost:8000/user/removefollower", {
             method: 'POST',
@@ -55,7 +56,11 @@ export default function FollowerItems(props) {
         chatable();
     }, []);
 
-    const chatstart = async () => {
+    const chatstart = async (event) => {
+        let id = event.target.id;
+        id=id.replace("chat","");
+        console.log(id);
+
         const serverRes = await fetch("http://localhost:8000/user/conversation", {
             method: 'POST',
             headers: {
@@ -63,7 +68,7 @@ export default function FollowerItems(props) {
                 "authorization": "Bearer".concat(" ", localStorage.getItem("token")),
             },
             body: JSON.stringify({
-                id: props.element._id,
+                id: id,
             }),
         }
         );
@@ -83,7 +88,7 @@ export default function FollowerItems(props) {
                     </div>
                     <div style={{ display: "flex", flexDirection: "row" }}>
                         <button type='submit' onClick={removeFol} className='followerRemove'>Remove</button>
-                        {chat ? <button type='submit' onClick={chatstart} className='followerRemove'>Chat</button> : null}
+                        {chat ? <button type='submit' id={"chat" + props.element._id} onClick={chatstart} className='followerRemove'>Chat</button> : null}
                     </div>
                 </div>
                 <div className="offcanvas offcanvas-start" tabIndex="-1" id={"offcanvas" + props.element._id} aria-labelledby="offcanvasExampleLabel" style={{ backgroundColor: "rgb(187, 193, 240)", color: "#fff" }}>
