@@ -223,13 +223,14 @@ routerUser.use("/profilefollowing", protect, async (req, res) => {
 })
 
 routerUser.use("/removefollower", protect, async (req, res) => {
+    console.log(req.user)
     try {
         const userID = req.user._id;
         await user.findByIdAndUpdate(userID, { $pull: { "follower": { "fol_id": req.body.id } } });
         await user.findByIdAndUpdate(req.body.id, { $pull: { "following": { "fol_id": userID } } });
-        return res.status(201).json("Deleted Follower");
+        return res.status(201).send("Deleted Follower");
     }
-    catch {
+    catch (e) {
         return res.status(401).send("Error");
     }
 })
@@ -295,6 +296,10 @@ routerUser.use("/editprofile", protect, async (req, res) => {
         return res.status(403).send("Invalid contact number");
     }
     await user.findByIdAndUpdate(userID, { username: req.body.username, age: req.body.age, contact: req.body.contact });
+    const postuser = await posts.find({ "postedBy.id": userID })
+    for (let i = 0; i < postuser.length; i++) {
+        await posts.findByIdAndUpdate(postuser[i]._id, { $set: { "postedBy.username": req.body.username } })
+    }
     return res.status(201).json("Updated Data");
 })
 
@@ -690,7 +695,7 @@ routerUser.use("/newPost", protect, async (req, res) => {
                 reported: 0,
                 deleted: 0,
             }
-            await subgreddiitModel.findByIdAndUpdate(req.body.sub_id, { $push: { tempobj } });
+            await subgreddiitModel.findByIdAndUpdate(req.body.sub_id, { $push: { memberTime: tempobj } });
         }
 
         let ban = sub.banned;
